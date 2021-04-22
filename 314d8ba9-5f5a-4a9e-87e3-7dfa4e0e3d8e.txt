@@ -1,9 +1,9 @@
 
 Building configuration...
 
-Current configuration : 60925 bytes
+Current configuration : 60950 bytes
 !
-! Last configuration change at 11:20:08 UTC Sat Feb 27 2021 by admin
+! Last configuration change at 22:08:35 UTC Wed Apr 7 2021 by admin
 !
 version 16.6
 no service pad
@@ -43,7 +43,6 @@ switch 1 provision c9300-24ux
 !
 ip routing
 !
-ip name-server 4.4.4.4
 ip dhcp relay information option
 !
 !
@@ -841,6 +840,7 @@ interface TenGigabitEthernet1/0/8
 !
 interface TenGigabitEthernet1/0/9
  device-tracking attach-policy IPDT_POLICY
+ shutdown
  service-policy input DNA-APIC_QOS_IN
  service-policy output DNA-dscp#APIC_QOS_Q_OUT
 !
@@ -915,7 +915,7 @@ interface TenGigabitEthernet1/0/23
  service-policy output DNA-dscp#APIC_QOS_Q_OUT
 !
 interface TenGigabitEthernet1/0/24
- description changed by DNAC -nnow
+ description changed by DNAC
  device-tracking attach-policy IPDT_POLICY
  service-policy input DNA-APIC_QOS_IN
  service-policy output DNA-dscp#APIC_QOS_Q_OUT
@@ -1962,6 +1962,8 @@ line vty 0 4
  transport input telnet ssh
 line vty 5 15
 !
+ntp source Loopback0
+ntp server 10.10.20.101
 !
 mac address-table notification mac-move
 wsma agent exec

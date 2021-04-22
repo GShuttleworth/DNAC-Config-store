@@ -1,18 +1,22 @@
 
 Building configuration...
 
-Current configuration : 15092 bytes
+Current configuration : 17644 bytes
 !
-! Last configuration change at 11:22:39 UTC Sat Feb 27 2021 by admin
+! Last configuration change at 21:18:54 UTC Mon Mar 29 2021
 !
-version 16.3
+version 17.4
 service timestamps debug datetime msec
 service timestamps log datetime msec
+! Call-home is enabled by Smart-Licensing.
+service call-home
+platform qfp utilization monitor load 80
 no platform punt-keepalive disable-kernel-core
 !
 hostname asr1001-x
 !
 boot-start-marker
+boot system flash bootflash:asr1001x-universalk9_noli.17.04.01b.SPA.bin
 boot config bootflash:iwan_recovery.cfg
 boot-end-marker
 !
@@ -25,12 +29,13 @@ vrf definition Mgmt-intf
  address-family ipv6
  exit-address-family
 !
-enable secret 5 xxxxxxxx
+enable secret 9 xxxxxxxx
 !
 aaa new-model
 !
 !
 aaa authentication login default local
+!
 !
 !
 !
@@ -44,16 +49,12 @@ aaa session-id common
 !
 !
 !
-!
-!
-
-
 ip name-server 10.10.20.11
-
 ip domain name abc.inc
 !
 !
 !
+login on-success log
 !
 !
 !
@@ -62,7 +63,10 @@ ip domain name abc.inc
 !
 !
 subscriber templating
-!
+! 
+! 
+! 
+! 
 !
 !
 !
@@ -75,6 +79,7 @@ flow exporter 10.10.20.103
  transport udp 6007
 !
 multilink bundle-name authenticated
+!
 !
 !
 !
@@ -101,6 +106,10 @@ crytpo pki xxxxxxx
  usage ssl-client
  revocation-check crl none
 !
+crytpo pki xxxxxxx
+ enrollment pkcs12
+ revocation-check crl
+!
 !
 crypto pki certificate chain xxxxxxx
 crypto pki certificate chain xxxxxxx
@@ -161,21 +170,54 @@ crypto pki certificate chain xxxxxxx
   xxxx  xxxxx  xxxx  xxxx  xxxx
   xxxx  xxxxx  xxxx  xxxx  xxxx
 quit
-
-
+crypto pki certificate chain xxxxxxx
+ certificate ca xxxxxxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+  xxxx  xxxxx  xxxx  xxxx  xxxx
+quit
+!
+!
 license udi pid ASR1001-X sn JAE200306M2
 license accept end user agreement
 license boot level adventerprise
+memory free low-watermark processor 374959
+!
 !
 spanning-tree extend system-id
+
+et-analytics
 diagnostic bootup level minimal
-!
 !
 username xxxxxxxx 
 username xxxxxxxx privilege 15 password 0 xxxxxxxx
 !
 redundancy
  mode none
+!
 !
 !
 !
@@ -196,11 +238,6 @@ cdp run
 !
 !
 !
-!
-! 
-! 
-! 
-! 
 ! 
 ! 
 !
@@ -258,12 +295,12 @@ router ospf 1
  network 10.10.22.0 0.0.0.255 area 1
  default-information originate always
 !
-ip forward-protocol nd
-!
 ip http server
 ip http authentication local
 ip http secure-server
 ip http client source-interface TenGigabitEthernet0/0/0
+ip forward-protocol nd
+!
 ip tftp source-interface GigabitEthernet0
 ip route 0.0.0.0 0.0.0.0 10.10.22.254
 ip ssh source-interface TenGigabitEthernet0/0/0
@@ -276,8 +313,8 @@ ip radius source-interface Loopback0
 logging source-interface TenGigabitEthernet0/0/0
 logging host 10.10.20.101
 logging host 10.10.20.103
-access-list 23 permit 10.10.0.0 0.0.255.255
-!
+ip access-list standard 23
+ 10 permit 10.10.0.0 0.0.255.255
 !
 snmp-server community xxxxxxxx RW
 snmp-server community xxxxxxxx RO
@@ -341,7 +378,6 @@ snmp-server enable traps syslog
 snmp-server enable traps l2tun session
 snmp-server enable traps l2tun pseudowire status
 snmp-server enable traps pki
-snmp-server enable traps trustsec-sxp conn-srcaddr-err msg-parse-err conn-config-err binding-err conn-up conn-down binding-expn-fail oper-nodeid-change binding-conflict
 snmp-server enable traps adslline
 snmp-server enable traps vdsl2line
 snmp-server enable traps ethernet evc status create delete
@@ -353,7 +389,8 @@ snmp-server enable traps entity-qfp mem-res-thresh throughput-notif
 snmp-server enable traps entity-state
 snmp-server enable traps lisp
 snmp-server enable traps entity-sensor
-snmp-server enable traps flash insertion removal
+snmp-server enable traps flash insertion
+snmp-server enable traps flash removal
 snmp-server enable traps firewall serverstatus
 snmp-server enable traps netsync
 snmp-server enable traps sbc adj-status
@@ -373,20 +410,6 @@ snmp-server enable traps isdn chan-not-avail
 snmp-server enable traps isdn ietf
 snmp-server enable traps cnpd
 snmp-server enable traps entity-diag boot-up-fail hm-test-recover hm-thresh-reached scheduled-test-fail
-snmp-server enable traps cef resource-failure peer-state-change peer-fib-state-change inconsistency
-snmp-server enable traps sonet
-snmp-server enable traps resource-policy
-snmp-server enable traps isis
-snmp-server enable traps ip local pool
-snmp-server enable traps mpls rfc ldp
-snmp-server enable traps mpls ldp
-snmp-server enable traps mpls rfc traffic-eng
-snmp-server enable traps mpls traffic-eng
-snmp-server enable traps mpls fast-reroute protected
-snmp-server enable traps nhrp nhs
-snmp-server enable traps nhrp nhc
-snmp-server enable traps nhrp nhp
-snmp-server enable traps nhrp quota-exceeded
 snmp-server enable traps ike policy add
 snmp-server enable traps ike policy delete
 snmp-server enable traps ike tunnel start
@@ -412,6 +435,20 @@ snmp-server enable traps gdoi ks-role-change
 snmp-server enable traps gdoi ks-gm-deleted
 snmp-server enable traps gdoi ks-peer-reachable
 snmp-server enable traps gdoi ks-peer-unreachable
+snmp-server enable traps cef resource-failure peer-state-change peer-fib-state-change inconsistency
+snmp-server enable traps sonet
+snmp-server enable traps resource-policy
+snmp-server enable traps nhrp nhs
+snmp-server enable traps nhrp nhc
+snmp-server enable traps nhrp nhp
+snmp-server enable traps nhrp quota-exceeded
+snmp-server enable traps isis
+snmp-server enable traps ip local pool
+snmp-server enable traps mpls rfc ldp
+snmp-server enable traps mpls ldp
+snmp-server enable traps mpls rfc traffic-eng
+snmp-server enable traps mpls traffic-eng
+snmp-server enable traps mpls fast-reroute protected
 snmp-server enable traps bulkstat collection transfer
 snmp-server enable traps alarms informational
 snmp-server enable traps voice
@@ -425,6 +462,7 @@ snmp-server host 10.10.20.101 xxxxxxxx
 snmp-server host 10.10.20.103 version 2c xxxxxxxx 
 !
 !
+!
 radius-server attribute 6 on-for-login-auth
 radius-server attribute 6 support-multiple
 radius-server attribute 8 include-in-access-req
@@ -435,10 +473,6 @@ radius-server deadtime 30
 !
 control-plane
 !
- !
- !
- !
- !
 !
 !
 !
@@ -466,11 +500,18 @@ line con 0
  logging synchronous
  stopbits 1
 line aux 0
- stopbits 1
 line vty 0 4
  transport input telnet ssh
 !
+call-home
+ ! If contact email address in call-home is configured as sch-smart-licensing@cisco.com
+ ! the email address configured in Cisco Smart License Portal will be used as contact email address to send SCH notifications.
+ contact-email-addr sch-smart-licensing@cisco.com
+ profile "CiscoTAC-1"
+  active
+  destination transport-method http
 ntp server 10.10.20.101
+!
 !
 !
 !

@@ -1,15 +1,14 @@
 
 Building configuration...
 
-Current configuration : 24479 bytes
+Current configuration : 24427 bytes
 !
-! Last configuration change at 11:34:03 UTC Sat Feb 27 2021 by admin
+! Last configuration change at 14:59:30 UTC Tue Mar 30 2021
 !
 version 16.9
 no service pad
 service timestamps debug datetime msec
 service timestamps log datetime msec
-! Call-home is enabled by Smart-Licensing.
 service call-home
 no platform punt-keepalive disable-kernel-core
 !

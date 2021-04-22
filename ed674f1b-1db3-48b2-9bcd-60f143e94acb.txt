@@ -1,15 +1,14 @@
 
 Building configuration...
 
-Current configuration : 53048 bytes
+Current configuration : 53038 bytes
 !
-! Last configuration change at 11:35:32 UTC Sat Feb 27 2021 by admin
+! Last configuration change at 21:43:22 UTC Tue Apr 20 2021
 !
 version 17.3
 service timestamps debug datetime msec
 service timestamps log datetime msec show-timezone year
 service password-encryption
-! Call-home is enabled by Smart-Licensing.
 service call-home
 no platform punt-keepalive disable-kernel-core
 !
@@ -52,7 +51,6 @@ ip nbar http-services
 !
 !
 !
-ip name-server 4.4.4.4
 !
 !
 !
@@ -520,12 +518,14 @@ interface TenGigabitEthernet1/0/9
 !
 interface TenGigabitEthernet1/0/10
  device-tracking attach-policy IPDT_POLICY
+ shutdown
  service-policy input DNA-APIC_QOS_IN
  service-policy output DNA-dscp#APIC_QOS_Q_OUT
  ip nbar protocol-discovery
 !
 interface TenGigabitEthernet1/0/11
  device-tracking attach-policy IPDT_POLICY
+ shutdown
  service-policy input DNA-APIC_QOS_IN
  service-policy output DNA-dscp#APIC_QOS_Q_OUT
  ip nbar protocol-discovery
@@ -1650,6 +1650,8 @@ call-home
  profile "CiscoTAC-1"
   active
   destination transport-method http
+ntp source Loopback0
+ntp server 10.10.20.101
 !
 !
 !
